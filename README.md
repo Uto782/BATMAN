@@ -1,69 +1,176 @@
-# ブラウザ対応状況
+# BATMAN
+# 観戦アプリ (Spectator App)
 
-## Web Bluetooth API サポート
+スポーツ観戦中に親が使用する、BLE接続対応のWebアプリケーションです。
 
-### ✅ 対応ブラウザ
+## 📱 概要
 
-#### Android
-- **Chrome** - 完全対応 ✅
-- **Edge** - 完全対応 ✅
-- **Opera** - 対応 ✅
+このアプリは、親が子どものハプティックデバイスとBluetooth接続し、試合の状況に応じて振動パターンを送信したり、子どもの応援活動をログに記録したりできます。
 
-#### Windows / Mac / Linux
-- **Chrome** - 完全対応 ✅
-- **Edge** - 完全対応 ✅
-- **Opera** - 対応 ✅
+## ✨ 主な機能
 
-### ❌ 非対応ブラウザ
+### ホーム画面
+- BLEデバイスとの接続・切断
+- 接続状態の表示
+- 観戦セッションの開始
 
-#### iOS / iPadOS
-- **Safari** - 非対応 ❌
-- **Chrome for iOS** - 非対応 ❌（SafariのWebViewを使用）
-- **Firefox for iOS** - 非対応 ❌
+### 観戦画面
+- リアルタイムの叩き回数カウンター
+- 3つの状態ボタン（通常・チャンス・ピンチ）
+- BLEデバイスへのパターン送信
+- セッション情報の表示
+- 観戦の終了
 
-### 🔧 iOS での解決方法
+### ログ画面
+- 過去の観戦セッション一覧
+- セッション詳細表示（統計・タイムライン）
+- 叩き回数・チャンス/ピンチ送信回数の確認
 
-iOSでこのアプリを使用するには、以下のいずれかの方法があります：
+## 🚀 使い方
 
-#### 方法1: Bluefy（推奨）
-1. App Storeから「Bluefy」をインストール（無料）
-2. BluefyでアプリのURLを開く
-3. Web Bluetooth APIが使用可能
+### 1. アプリを開く
 
-#### 方法2: Safari実験的機能（iOS 16以降）
-1. 設定 → Safari → 詳細 → Experimental Features
-2. 「Web Bluetooth」を有効化
-3. Safariでアプリを開く
+ブラウザで `index.html` を開きます。
 
-> **注意**: 方法2は実験的機能のため、動作が不安定な場合があります。Bluefyの使用を推奨します。
+**重要な注意事項:**
+- Web Bluetooth APIを使用するため、**HTTPS接続**または**localhost**が必要です
+- 推奨ブラウザ: Chrome、Edge（iOSのSafariは実験的サポート）
 
----
+### 2. ローカルサーバーで起動（推奨）
 
-## 推奨環境
+```bash
+# Python 3の場合
+python -m http.server 8000
 
-- **Android**: Chrome ブラウザ
-- **iOS**: Bluefy アプリ
-- **PC**: Chrome または Edge
+# Node.jsの場合
+npx http-server
+```
 
----
+その後、ブラウザで `http://localhost:8000` にアクセスします。
 
-## トラブルシューティング
+### 3. デバイスに接続
 
-### 「このブラウザはBluetooth非対応です」と表示される場合
+1. ホーム画面で「デバイスに接続」ボタンをクリック
+2. BLEデバイスのスキャンが開始されます
+3. 一覧から対象デバイスを選択して接続
 
-1. **Androidの場合**
-   - Chromeブラウザをインストール
-   - アプリのURLをChromeで開く
+### 4. 観戦を開始
 
-2. **iOSの場合**
-   - Bluefyアプリをインストール
-   - Bluefyでアプリを開く
+1. 「観戦を開始」ボタンをクリック
+2. 観戦画面に遷移します
+3. 状態ボタンを押してデバイスにパターンを送信
+4. 叩き回数がリアルタイムで更新されます
 
-3. **PCの場合**
-   - Chrome または Edge をインストール
-   - アプリのURLを開く
+### 5. 観戦を終了
 
-### その他のエラー
+1. 「観戦を終了」ボタンをクリック
+2. セッションが保存されます
+3. ログ画面で確認できます
 
-- **「HTTPS接続が必要です」**: Vercelでデプロイ済みのURLを使用してください
-- **「デバイスが見つかりません」**: BLEデバイスの電源とBluetoothがオンか確認
+## 🎨 デザイン
+
+- **iPhone 16対応**: 393×852pxの縦長レイアウト
+- **ダークモード**: 目に優しい暗色テーマ
+- **グラスモーフィズム**: モダンな半透明エフェクト
+- **スムーズアニメーション**: 快適な操作感
+
+## 🔧 技術仕様
+
+### BLE通信
+
+**パターンID:**
+- `0`: 通常
+- `1`: チャンス
+- `2`: ピンチ
+
+**イベント受信:**
+- デバイスからのタップイベントを受信
+- リアルタイムでカウンター更新
+
+### データ保存
+
+- **localStorage**を使用
+- セッションとイベントを永続化
+- ブラウザキャッシュクリアで削除
+
+### ファイル構成
+
+```
+spectator-app/
+├── index.html              # メインHTML
+├── style.css               # スタイルシート
+├── app.js                  # アプリコントローラー
+├── ble-manager.js          # BLE接続管理
+├── data-manager.js         # データ管理
+├── home-screen.js          # ホーム画面
+├── spectating-screen.js    # 観戦画面
+├── log-screen.js           # ログ画面
+└── README.md               # このファイル
+```
+
+## 🔌 BLE設定のカスタマイズ
+
+デバイスのUUIDを変更する場合は、`ble-manager.js`の以下の部分を編集してください:
+
+```javascript
+this.SERVICE_UUID = '12345678-1234-5678-1234-56789abcdef0';
+this.TX_CHARACTERISTIC_UUID = '12345678-1234-5678-1234-56789abcdef1';
+this.RX_CHARACTERISTIC_UUID = '12345678-1234-5678-1234-56789abcdef2';
+```
+
+## 📝 データ構造
+
+### セッション
+```javascript
+{
+  id: string,
+  dateTime: string (ISO),
+  deviceName: string,
+  gameTitle: string | null,
+  tapCountTotal: number,
+  chanceCountTotal: number,
+  pinchCountTotal: number,
+  normalCountTotal: number,
+  status: 'active' | 'completed',
+  startTime: number,
+  endTime: number
+}
+```
+
+### イベントログ
+```javascript
+{
+  id: string,
+  sessionId: string,
+  timestamp: string (ISO),
+  timestampMs: number,
+  type: 'tap' | 'chance' | 'pinch' | 'normal',
+  data: object
+}
+```
+
+## 🐛 トラブルシューティング
+
+### BLE接続ができない
+
+- HTTPS接続またはlocalhostで実行しているか確認
+- Chrome/Edgeブラウザを使用しているか確認
+- デバイスのBluetoothがオンになっているか確認
+
+### データが保存されない
+
+- ブラウザのlocalStorageが有効か確認
+- プライベートブラウジングモードでないか確認
+
+### iOSで動作しない
+
+- iOSのSafariは実験的サポートのため、設定で有効化が必要
+- Chrome for iOSの使用を推奨
+
+## 📄 ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
+
+## 🙏 謝辞
+
+Google Fonts (Noto Sans JP) を使用しています。
