@@ -27,6 +27,26 @@ class BLEManager {
         return true;
     }
 
+    // Get detailed support information
+    getSupportInfo() {
+        const userAgent = navigator.userAgent;
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+        const isAndroid = /Android/.test(userAgent);
+        const isSafari = /Safari/.test(userAgent) && !/Chrome/.test(userAgent);
+        const isChrome = /Chrome/.test(userAgent);
+        const isEdge = /Edg/.test(userAgent);
+
+        return {
+            isSupported: !!navigator.bluetooth,
+            isIOS: isIOS,
+            isAndroid: isAndroid,
+            isSafari: isSafari,
+            isChrome: isChrome,
+            isEdge: isEdge,
+            userAgent: userAgent
+        };
+    }
+
     // Scan and connect to a BLE device
     async connect() {
         if (!this.isSupported()) {
