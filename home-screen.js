@@ -40,6 +40,7 @@ class HomeScreen {
         } catch (error) {
             console.error('Connection error:', error);
 
+            const supportInfo = bleManager.getSupportInfo();
             let errorMessage = '接続に失敗しました';
 
             if (error.name === 'NotFoundError') {
@@ -47,7 +48,18 @@ class HomeScreen {
             } else if (error.name === 'SecurityError') {
                 errorMessage = 'HTTPS接続が必要です';
             } else if (error.message.includes('not supported')) {
-                errorMessage = 'このブラウザはBluetooth非対応です';
+                // Detailed browser-specific guidance
+                if (supportInfo.isIOS) {
+                    if (supportInfo.isSafari) {
+                        errorMessage = 'iOSのSafariは非対応です\n\n【対応方法】\n1. Bluefy（無料アプリ）をインストール\n2. またはChrome for iOSを使用\n\n※iOS 16以降でも実験的機能の有効化が必要';
+                    } else {
+                        errorMessage = 'このブラウザは非対応です\n\nBluefy（無料アプリ）の使用を推奨します';
+                    }
+                } else if (supportInfo.isAndroid) {
+                    errorMessage = 'このブラウザは非対応です\n\nChromeブラウザをご利用ください';
+                } else {
+                    errorMessage = 'このブラウザはBluetooth非対応です\n\nChrome、Edge、またはBluefy（iOS）をご利用ください';
+                }
             }
 
             this.showFeedback(errorMessage, 'error');
@@ -106,7 +118,25 @@ class HomeScreen {
         // Create temporary feedback element
         const feedback = document.createElement('div');
         feedback.className = `feedback feedback-${type}`;
-        feedback.textContent = message;
+
+        // Handle multi-line messages
+        const lines = message.split('\n');
+        lines.forEach((line, index) => {
+            const p = document.createElement('p');
+            p.textContent = line;
+            p.style.margin = index === 0 ? '0' : '0.5rem 0 0 0';
+            if (line.startsWith('【') || line.startsWith('※')) {
+                p.style.fontSize = '0.875rem';
+                p.style.marginTop = '0.75rem';
+            }
+            if (line.match(/^\d+\./)) {
+                p.style.fontSize = '0.875rem';
+                p.style.textAlign = 'left';
+                p.style.marginLeft = '1rem';
+            }
+            feedback.appendChild(p);
+        });
+
         feedback.style.cssText = `
             position: fixed;
             top: 20px;
@@ -121,6 +151,7 @@ class HomeScreen {
             animation: slideDown 0.3s ease;
             max-width: 90%;
             text-align: center;
+            line-height: 1.5;
         `;
 
         document.body.appendChild(feedback);
@@ -128,7 +159,7 @@ class HomeScreen {
         setTimeout(() => {
             feedback.style.animation = 'slideUp 0.3s ease';
             setTimeout(() => feedback.remove(), 300);
-        }, 3000);
+        }, 5000); // Extended to 5 seconds for longer messages
     }
 }
 
